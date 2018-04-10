@@ -13,6 +13,8 @@ public class Population : MonoBehaviour
 	private List<GameObject> population = new List<GameObject>();
 	private int generation = 1;
 	private float mutationChance = 0.05f;
+	private float averageDistance = 0.0f;
+	private float bestDistance = 0.0f;
 
 	GUIStyle guiStyle = new GUIStyle();
 	void OnGUI()
@@ -20,10 +22,11 @@ public class Population : MonoBehaviour
 		guiStyle.fontSize = 20;
 		guiStyle.normal.textColor = Color.white;
 		GUI.BeginGroup (new Rect (10, 10, 250, 150));
-		GUI.Box (new Rect (0,0,140,140), "Stats", guiStyle);
-		GUI.Label(new Rect (10,25,200,30), "Gen: " + generation, guiStyle);
-		GUI.Label(new Rect (10,50,200,30), string.Format("Time: {0:0.00}",elapsed), guiStyle);
-		GUI.Label(new Rect (10,75,200,30), "Population: " + population.Count, guiStyle);
+		GUI.Box (new Rect (0, 0, 140, 140), "Stats", guiStyle);
+		GUI.Label(new Rect (10, 25, 200, 30), "Gen: " + generation, guiStyle);
+		GUI.Label(new Rect (10, 50, 200, 30), string.Format("Time: {0:0.00}",elapsed), guiStyle);
+		GUI.Label(new Rect (10, 75, 200, 30), "Average: " + averageDistance, guiStyle);
+		GUI.Label(new Rect (10, 100, 200, 30), "Best: " + bestDistance, guiStyle);
 		GUI.EndGroup ();
 	}
 	
@@ -55,8 +58,10 @@ public class Population : MonoBehaviour
 
 	void BreedNewPopulation()
 	{
-		List<GameObject> sortedList = population.OrderByDescending(o => o.GetComponent<Brain>().timeAlive).ToList();
-		
+		List<GameObject> sortedList = population.OrderByDescending(o => o.GetComponent<Brain>().distanceMoved).ToList();
+		averageDistance = population.Average(o => o.GetComponent<Brain>().distanceMoved);
+		bestDistance = sortedList[0].GetComponent<Brain>().distanceMoved;
+
 		population.Clear();
 		for (int i = 0; i < sortedList.Count / 2; i++)
 		{
